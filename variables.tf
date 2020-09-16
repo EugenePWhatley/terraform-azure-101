@@ -13,3 +13,7 @@ variable "resource_prefix" {
 variable "web_server_address_space" {
   type = string
 }
+
+variable "web_server_address_prefix" {
+  type = string
+}
