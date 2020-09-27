@@ -95,6 +95,15 @@ resource "azurerm_subnet_network_security_group_association" "web_server_sag" {
   subnet_id                 = azurerm_subnet.web_server_subnet["web_server"].id
 }
 
+# Pre-existing resource - Imported using `terraform import`
+resource "azurerm_storage_account" "storage_account" {
+  name                     = "ltfbootdiagnostics"
+  location                 = var.web_server_location
+  resource_group_name      = azurerm_resource_group.web_server_rg.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
 ##### NOT NEEDED WITH SCALE SET #####
 # resource "azurerm_windows_virtual_machine" "web_server" {
 #   name                  = "${var.web_server_name}-${format("%02d", count.index)}"
@@ -167,6 +176,11 @@ resource "azurerm_virtual_machine_scale_set" "web_server" {
       subnet_id                              = azurerm_subnet.web_server_subnet["web_server"].id
       load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.web_server_lb_backend_pool.id]
     }
+  }
+
+  boot_diagnostics {
+    enabled     = true
+    storage_uri = azurerm_storage_account.storage_account.primary_blob_endpoint
   }
 
   extension {
