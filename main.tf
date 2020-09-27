@@ -11,6 +11,11 @@ locals {
 resource "azurerm_resource_group" "web_server_rg" {
   name     = var.web_server_rg
   location = var.web_server_location
+
+  tags = {
+    environment   = local.build_environment
+    build-version = var.terraform_script_version
+  }
 }
 
 resource "azurerm_virtual_network" "web_server_vnet" {
